@@ -199,6 +199,10 @@ e decide como desenhar. Se um número precisar de conta, a conta vai para um `.s
 Quando a fonte não tem dado para a temporada (cartões de 2025, estatísticas de 2024, gols antes de
 2014), o painel diz isso em vez de mostrar zero.
 
+Se o banco ainda não existir (por exemplo, no Streamlit Cloud, já que `data/` não vai para o
+GitHub), a primeira abertura do painel roda o mesmo pipeline deste README: baixa a fonte, confere o
+SHA-256 e cria raw → refined → marts. Leva alguns segundos e acontece uma vez só.
+
 O painel abre na temporada 2023, a mais completa da fonte. A temporada escolhida vai para a URL,
 então dá para abrir ou compartilhar uma temporada específica: `http://localhost:8501/?temporada=2019`.
 

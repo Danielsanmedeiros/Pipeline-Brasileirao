@@ -1,12 +1,17 @@
 """Painel do Brasileirão: lê só a camada marts, sem nenhum cálculo na tela.
 
-Uso:  streamlit run dashboard/app.py   (depois de python -m pipeline.run)
+Uso:  streamlit run dashboard/app.py
 
 Regra: todo número exibido aqui sai pronto de uma tabela marts.*. O painel só
 seleciona linhas (filtro por temporada) e escolhe como desenhar. Se um número
 precisar de conta, a conta vai para um .sql em sql/marts/, não para este arquivo.
+
+Se o banco não existir (é o caso no Streamlit Cloud, porque data/ não vai para o
+GitHub), a primeira abertura roda o mesmo pipeline do README: download conferido
+por SHA-256 e raw -> refined -> marts. Isso não é cálculo do painel; é o pipeline.
 """
 
+import sys
 from pathlib import Path
 
 import altair as alt
@@ -14,7 +19,13 @@ import duckdb
 import pandas as pd
 import streamlit as st
 
-BANCO = Path(__file__).resolve().parent.parent / "data" / "brasileirao.duckdb"
+RAIZ = Path(__file__).resolve().parent.parent
+if str(RAIZ) not in sys.path:  # para importar pipeline/ rodando de dashboard/
+    sys.path.insert(0, str(RAIZ))
+
+from pipeline import download, run  # noqa: E402
+
+BANCO = run.BANCO
 REPO = "https://github.com/Danielsanmedeiros/Pipeline-Brasileirao"
 ORDEM_FAIXAS = ["01-15", "16-30", "31-45", "45+", "46-60", "61-75", "76-90", "90+"]
 
@@ -28,8 +39,24 @@ def ler_mart(tabela: str) -> pd.DataFrame:
         return con.execute(f"select * from marts.{tabela}").df()
 
 
-if not BANCO.exists():
-    st.error("Rode antes: python -m pipeline.download e python -m pipeline.run", title="Banco não encontrado")
+@st.cache_resource(show_spinner="Primeira abertura: baixando os dados do Kaggle e rodando o pipeline...")
+def garantir_banco() -> None:
+    """Cria data/brasileirao.duckdb com o pipeline do projeto, se ainda não existir. Roda uma vez."""
+    if BANCO.exists():
+        return
+    if not run.PASTA_RAW.exists():
+        download.baixar()
+    run.main()
+
+
+try:
+    garantir_banco()
+except Exception as erro:  # sem internet, Kaggle fora do ar, SHA-256 diferente...
+    st.error(
+        f"Não foi possível montar o banco: {erro}. Rode localmente: "
+        "python -m pipeline.download e python -m pipeline.run",
+        title="Banco não encontrado",
+    )
     st.stop()
 
 classificacao = ler_mart("classificacao")

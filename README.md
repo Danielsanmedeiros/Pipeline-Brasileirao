@@ -199,6 +199,9 @@ e decide como desenhar. Se um número precisar de conta, a conta vai para um `.s
 Quando a fonte não tem dado para a temporada (cartões de 2025, estatísticas de 2024, gols antes de
 2014), o painel diz isso em vez de mostrar zero.
 
+O painel abre na temporada 2023, a mais completa da fonte. A temporada escolhida vai para a URL,
+então dá para abrir ou compartilhar uma temporada específica: `http://localhost:8501/?temporada=2019`.
+
 ---
 
 ## Onde a IA errou ou assumiu algo que eu não pedi

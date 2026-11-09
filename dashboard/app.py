@@ -47,8 +47,16 @@ st.caption(
     f"Cada número vem de uma tabela da camada marts — código em [GitHub]({REPO})."
 )
 
+TEMPORADA_INICIAL = 2023  # temporada completa (gols, cartões e estatísticas) e com virada na liderança
+
 temporadas = sorted(mando["temporada"].tolist(), reverse=True)
-temporada = st.selectbox("Temporada", temporadas, index=0, key="temporada")
+temporada = st.selectbox(
+    "Temporada",
+    temporadas,
+    index=temporadas.index(TEMPORADA_INICIAL),
+    key="temporada",
+    bind="query-params",  # a temporada vai para a URL (?temporada=2019), para compartilhar o link
+)
 
 campeao = classificacao.query("temporada == @temporada and posicao == 1").iloc[0]
 mando_t = mando.query("temporada == @temporada").iloc[0]

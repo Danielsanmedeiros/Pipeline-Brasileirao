@@ -127,6 +127,67 @@ def test_disciplina_conta_jogos_sem_cartao_e_ignora_temporada_sem_dado(banco):
     assert linhas == [(2021, "A", 2, 2, 1, 1.5), (2021, "B", 2, 0, 0, 0.0)]
 
 
+# ---------- marts.pontos_por_mes ----------
+
+def test_lider_muda_de_um_mes_para_o_outro(banco):
+    # Maio: A vence B. Junho: C vence A e depois B. A lidera maio, C lidera junho.
+    con = rodar(banco(partidas=[
+        partida(1, "10/05/2021", "A", "B", 1, 0),
+        partida(2, "05/06/2021", "C", "A", 2, 0),
+        partida(3, "20/06/2021", "C", "B", 1, 0),
+    ]), "refined", "marts")
+    lideres = con.execute(
+        "select strftime(mes, '%Y-%m'), clube, pontos from marts.pontos_por_mes where lider order by mes"
+    ).fetchall()
+    assert lideres == [("2021-05", "A", 3), ("2021-06", "C", 6)]
+
+
+def test_clube_sem_jogo_no_mes_continua_com_os_pontos(banco):
+    # C não joga em maio: aparece com 0 pontos. B não joga em junho: mantém os pontos de maio.
+    con = rodar(banco(partidas=[
+        partida(1, "10/05/2021", "B", "A", 2, 0),
+        partida(2, "05/06/2021", "C", "A", 1, 1),
+    ]), "refined", "marts")
+    linhas = con.execute(
+        "select strftime(mes, '%Y-%m'), clube, jogos, pontos from marts.pontos_por_mes "
+        "where clube in ('B', 'C') order by clube, mes"
+    ).fetchall()
+    assert linhas == [
+        ("2021-05", "B", 1, 3), ("2021-06", "B", 1, 3),
+        ("2021-05", "C", 0, 0), ("2021-06", "C", 1, 1),
+    ]
+
+
+def test_liderou_na_temporada_e_jogo_de_fevereiro(banco):
+    # Jogo de fevereiro/2021 ainda é temporada 2020: entra como mais um mês dela.
+    con = rodar(banco(partidas=[
+        partida(1, "10/12/2020", "A", "B", 1, 0),
+        partida(2, "10/02/2021", "B", "A", 3, 0),
+    ]), "refined", "marts")
+    linhas = con.execute(
+        "select temporada, strftime(mes, '%Y-%m'), clube, lider, liderou_na_temporada "
+        "from marts.pontos_por_mes order by mes, clube"
+    ).fetchall()
+    assert linhas == [
+        (2020, "2020-12", "A", True, True), (2020, "2020-12", "B", False, True),
+        (2020, "2021-02", "A", False, True), (2020, "2021-02", "B", True, True),
+    ]
+
+
+def test_ultimo_mes_igual_a_classificacao_final(banco):
+    con = rodar(banco(partidas=[
+        partida(1, "10/05/2021", "A", "B", 1, 0),
+        partida(2, "05/06/2021", "C", "A", 2, 2),
+        partida(3, "20/07/2021", "B", "C", 0, 3),
+    ]), "refined", "marts")
+    ultimo = con.execute(
+        "select posicao, clube, pontos from marts.pontos_por_mes "
+        "where mes = (select max(mes) from marts.pontos_por_mes) order by posicao"
+    ).fetchall()
+    final = con.execute("select posicao, clube, pontos from marts.classificacao order by posicao").fetchall()
+    assert ultimo == final
+
+
 # ---------- marts.finalizacao_clube ----------
 
 def test_finalizacao_usa_placar_e_exige_10_jogos(banco):

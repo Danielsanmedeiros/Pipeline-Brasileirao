@@ -3,6 +3,11 @@
 Pipeline de dados do Campeonato Brasileiro Série A, de 2003 a 2025: do CSV de origem até os
 indicadores, com Python, SQL (DuckDB), testes com pytest e git.
 
+**Painel online:** https://pipeline-brasileirao-my2rhvpjnhjckhhvdi5gpc.streamlit.app/
+(escolha a temporada no filtro, ou abra uma direto pelo link, como
+[`?temporada=2019`](https://pipeline-brasileirao-my2rhvpjnhjckhhvdi5gpc.streamlit.app/?temporada=2019)).
+Se o painel estiver "dormindo" por falta de visitas, clique no botão para acordá-lo; leva cerca de um minuto.
+
 **Perguntas que o dado responde aqui**
 
 1. Quem terminou em que posição em cada temporada?
@@ -204,7 +209,9 @@ GitHub), a primeira abertura do painel roda o mesmo pipeline deste README: baixa
 SHA-256 e cria raw → refined → marts. Leva alguns segundos e acontece uma vez só.
 
 O painel abre na temporada 2023, a mais completa da fonte. A temporada escolhida vai para a URL,
-então dá para abrir ou compartilhar uma temporada específica: `http://localhost:8501/?temporada=2019`.
+então dá para abrir ou compartilhar uma temporada específica: `http://localhost:8501/?temporada=2019`
+(local) ou o mesmo `?temporada=2019` no endereço do painel online, publicado no Streamlit Community
+Cloud a partir deste repositório.
 
 ---
 

@@ -1,0 +1,14 @@
+# Tema do painel: fundo verde-claro (gramado) em vez do branco padrão.
+# Fica na raiz do projeto porque o painel é aberto daqui:  streamlit run dashboard/app.py
+
+[theme]
+base = "light"
+backgroundColor = "#EEF4EE"            # fundo da página
+secondaryBackgroundColor = "#DCE8DD"   # caixa de seleção e cabeçalho da tabela
+textColor = "#1B2A1F"
+primaryColor = "#1F7A3A"               # destaque (seleção, links)
+linkColor = "#1F7A3A"
+borderColor = "#C3D5C6"                # bordas dos cartões
+
+[browser]
+gatherUsageStats = false

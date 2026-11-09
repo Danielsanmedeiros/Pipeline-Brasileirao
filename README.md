@@ -73,7 +73,13 @@ marts.disciplina_clube   220 linhas      marts.mando_de_campo      23 linhas
 marts.finalizacao_clube  200 linhas
 ```
 
-Para consultar os indicadores:
+Para abrir o painel (opcional, lê só a camada marts):
+
+```bash
+streamlit run dashboard/app.py
+```
+
+Para consultar os indicadores direto no banco:
 
 ```bash
 python -c "import duckdb; print(duckdb.connect('data/brasileirao.duckdb').sql('select * from marts.mando_de_campo'))"
@@ -176,9 +182,16 @@ pipeline/run.py          carrega a raw e roda sql/refined e sql/marts
 sql/refined/*.sql        camada transformada (uma tabela por arquivo)
 sql/marts/*.sql          indicadores (um indicador por arquivo)
 tests/                   pytest com dado inventado em DuckDB em memória
+dashboard/app.py         painel Streamlit: lê só marts.*, sem nenhum cálculo na tela
 ```
 
-Dashboard: não feito (opcional no enunciado).
+### Painel
+
+[dashboard/app.py](dashboard/app.py) mostra os 5 indicadores com filtro por temporada. Regra: todo
+número exibido sai pronto de uma tabela `marts.*`. O painel só filtra linhas pela temporada escolhida
+e decide como desenhar. Se um número precisar de conta, a conta vai para um `.sql` em `sql/marts/`.
+Quando a fonte não tem dado para a temporada (cartões de 2025, estatísticas de 2024, gols antes de
+2014), o painel diz isso em vez de mostrar zero.
 
 ---
 

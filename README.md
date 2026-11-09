@@ -10,6 +10,7 @@ indicadores, com Python, SQL (DuckDB), testes com pytest e git.
 3. Em que momento do jogo saem os gols, e quanto pesam os acréscimos?
 4. Quais clubes levam mais cartões por jogo?
 5. Quais clubes transformam mais chutes em gol, e ter mais posse significa marcar mais?
+6. Quem estava na frente em cada mês do campeonato?
 
 ---
 
@@ -57,7 +58,7 @@ Depois:
 pip install -r requirements.txt
 python -m pipeline.download      # baixa os 4 CSVs para data/raw/ e confere o SHA-256
 python -m pipeline.run           # cria data/brasileirao.duckdb com raw -> refined -> marts
-pytest                           # 24 testes, com dado inventado, sem abrir o banco
+pytest                           # 28 testes, com dado inventado, sem abrir o banco
 ```
 
 Saída esperada de `python -m pipeline.run`:
@@ -70,7 +71,7 @@ raw.partidas            9165 linhas      refined.partidas        9165 linhas
 
 marts.classificacao      470 linhas      marts.gols_por_faixa      96 linhas
 marts.disciplina_clube   220 linhas      marts.mando_de_campo      23 linhas
-marts.finalizacao_clube  200 linhas
+marts.finalizacao_clube  200 linhas      marts.pontos_por_mes    3994 linhas
 ```
 
 Para abrir o painel (opcional, lê só a camada marts):
@@ -119,6 +120,7 @@ recriado do zero a cada execução. Os `.sql` de cada camada rodam em ordem alfa
 | `marts.gols_por_faixa` | uma faixa de minuto em uma temporada | `temporada` + `faixa` | 2014–2025 |
 | `marts.disciplina_clube` | um clube em uma temporada | `temporada` + `clube` | 2014–2024 |
 | `marts.finalizacao_clube` | um clube em uma temporada (mín. 10 jogos com estatística) | `temporada` + `clube` | 2015–2023, 2025 |
+| `marts.pontos_por_mes` | um clube no fim de um mês de uma temporada | `temporada` + `mes` + `clube` | 2003–2025 |
 
 As tabelas se ligam por `partida_id`. Todos os indicadores que não são de partidas usam um JOIN
 com `refined.partidas` para obter a temporada e o placar.
@@ -134,6 +136,7 @@ com `refined.partidas` para obter a temporada e o placar.
 | Gols por faixa de minuto | [sql/marts/03_gols_por_faixa.sql](sql/marts/03_gols_por_faixa.sql) | gols ⨝ partidas |
 | Cartões por jogo | [sql/marts/04_disciplina_clube.sql](sql/marts/04_disciplina_clube.sql) | cartões ⨝ partidas |
 | Conversão de chutes e posse | [sql/marts/05_finalizacao_clube.sql](sql/marts/05_finalizacao_clube.sql) | estatísticas ⨝ partidas |
+| Líder mês a mês | [sql/marts/06_pontos_por_mes.sql](sql/marts/06_pontos_por_mes.sql) | partidas |
 
 ### O que eles mostram
 
@@ -151,6 +154,9 @@ com `refined.partidas` para obter a temporada e o placar.
   (2,83) no topo; Corinthians (2,17) é o mais disciplinado.
 - **Finalização:** a posse média tem correlação 0,57 com os gols por jogo e 0,41 com a
   conversão de chutes. Correlação não é causa: times melhores têm mais posse **e** mais gols.
+- **Líder mês a mês:** em 2023, o Botafogo terminou de abril a outubro na liderança e o
+  Palmeiras passou em novembro. Conferência: o último mês de cada temporada é igual à
+  classificação final nas 23 temporadas (470 de 470 linhas).
 
 ---
 
@@ -187,7 +193,7 @@ dashboard/app.py         painel Streamlit: lê só marts.*, sem nenhum cálculo 
 
 ### Painel
 
-[dashboard/app.py](dashboard/app.py) mostra os 5 indicadores com filtro por temporada. Regra: todo
+[dashboard/app.py](dashboard/app.py) mostra os 6 indicadores com filtro por temporada. Regra: todo
 número exibido sai pronto de uma tabela `marts.*`. O painel só filtra linhas pela temporada escolhida
 e decide como desenhar. Se um número precisar de conta, a conta vai para um `.sql` em `sql/marts/`.
 Quando a fonte não tem dado para a temporada (cartões de 2025, estatísticas de 2024, gols antes de

@@ -37,6 +37,7 @@ mando = ler_mart("mando_de_campo")
 gols_faixa = ler_mart("gols_por_faixa")
 disciplina = ler_mart("disciplina_clube")
 finalizacao = ler_mart("finalizacao_clube")
+pontos_mes = ler_mart("pontos_por_mes")
 
 # ---------- cabeçalho e filtro ----------
 
@@ -90,6 +91,43 @@ with st.container(border=True):
         strokeDash=[4, 4], color="gray"
     ).encode(x="temporada:O")
     st.altair_chart(linhas + sem_torcida, alt="Vitória do mandante caiu de cerca de 50% para 45% a 47% desde 2017")
+
+# ---------- corrida pelo título (mês a mês) ----------
+
+with st.container(border=True):
+    st.subheader(f"Quem estava na frente, mês a mês — {temporada}")
+    st.caption(
+        "Pontos acumulados no fim de cada mês dos clubes que terminaram pelo menos um mês na liderança. "
+        "Os pontos maiores marcam o líder daquele mês. — `marts.pontos_por_mes`"
+    )
+    corrida = pontos_mes.query("temporada == @temporada and liderou_na_temporada")
+    col_grafico, col_lideres = st.columns([3, 1])
+    with col_grafico:
+        base = alt.Chart(corrida).encode(
+            x=alt.X("yearmonth(mes):T", title=None, axis=alt.Axis(format="%m/%Y", tickCount="month")),
+            y=alt.Y("pontos:Q", title="Pontos acumulados"),
+            color=alt.Color("clube:N", title=None, legend=alt.Legend(orient="top")),
+            tooltip=[alt.Tooltip("yearmonth(mes):T", title="Mês", format="%m/%Y"),
+                     alt.Tooltip("clube:N", title="Clube"), alt.Tooltip("posicao:Q", title="Posição"),
+                     alt.Tooltip("pontos:Q", title="Pontos"), alt.Tooltip("jogos:Q", title="Jogos")],
+        )
+        st.altair_chart(
+            base.mark_line()
+            + base.mark_circle().encode(size=alt.condition("datum.lider", alt.value(160), alt.value(40))),
+            alt=f"Pontos acumulados mês a mês dos clubes que lideraram o Brasileirão {temporada}",
+        )
+    with col_lideres:
+        st.markdown("**Líder no fim de cada mês**")
+        st.dataframe(
+            corrida.query("lider")[["mes", "clube", "pontos"]],
+            hide_index=True,
+            column_config={
+                "mes": st.column_config.DateColumn("Mês", format="MM/YYYY"),
+                "clube": "Líder",
+                "pontos": "Pts",
+            },
+            alt=f"Líder do Brasileirão {temporada} no fim de cada mês",
+        )
 
 # ---------- classificação e gols por minuto ----------
 

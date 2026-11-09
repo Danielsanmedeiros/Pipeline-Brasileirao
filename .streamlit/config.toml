@@ -9,6 +9,8 @@ textColor = "#1B2A1F"
 primaryColor = "#1F7A3A"               # destaque (seleção, links)
 linkColor = "#1F7A3A"
 borderColor = "#C3D5C6"                # bordas dos cartões
+# cores das séries nos gráficos: bem distintas entre si e escuras o bastante para o fundo verde
+chartCategoricalColors = ["#4E79A7", "#E15759", "#F28E2B", "#59A14F", "#B07AA1", "#9C755F", "#EDC948", "#76B7B2", "#FF9DA7", "#BAB0AC"]
 
 [browser]
 gatherUsageStats = false

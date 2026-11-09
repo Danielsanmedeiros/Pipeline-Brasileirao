@@ -1,0 +1,8 @@
+# ambiente
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# dados: baixados pelo pipeline (python -m pipeline.download), não versionados
+data/

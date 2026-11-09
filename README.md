@@ -218,4 +218,4 @@ mostrou clubes com 0 cartões em 38 jogos. Contando os cartões por temporada: *
 empatavam em pontos, mas no dado inventado um tinha 4 e o outro tinha 3. Recalculei à mão, criei um
 teste com empate de verdade e quebrei a regra de propósito para ver o teste falhar.
 
-**Conferência minha:** *comparei a classificação de 2023 do painel com a tabela oficial. O campeão (Palmeiras, 70 pontos) e os quatro rebaixados (Santos, Goias, Coritiba, America-MG) são os mesmos, e a linha completa do Botafogo (V/E/D/saldo) bate. Isso confirma o cálculo de pontos e a ordem de desempate em marts.classificacao.
+**Conferência minha:** comparei a classificação de 2023 do painel com a tabela oficial. O campeão (Palmeiras, 70 pontos) e os quatro rebaixados (Santos, Goias, Coritiba, America-MG) são os mesmos, e a linha completa do Botafogo (V/E/D/saldo) bate. Isso confirma o cálculo de pontos e a ordem de desempate em marts.classificacao.

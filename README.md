@@ -34,8 +34,8 @@ projeto daqui a um ano teria outros números nos indicadores.
 Requisitos: Python 3.10 ou mais novo (testado com 3.13) e git. Não precisa de conta no Kaggle.
 
 ```bash
-git clone <url-deste-repositório>
-cd <pasta-do-repositório>
+git clone https://github.com/Danielsanmedeiros/Pipeline-Brasileirao.git
+cd Pipeline-Brasileirao
 python -m venv .venv
 ```
 

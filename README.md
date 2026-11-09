@@ -197,23 +197,26 @@ Quando a fonte não tem dado para a temporada (cartões de 2025, estatísticas d
 
 ## Onde a IA errou ou assumiu algo que eu não pedi
 
-> ⚠️ **Rascunho: revisar e reescrever com suas palavras antes de entregar.** Os quatro casos
-> abaixo aconteceram de verdade durante a construção (estão no histórico de commits), mas
-> esta seção é sobre a **sua** conferência. Confira cada número e acrescente o que você
-> mesmo encontrar.
+Usei IA em todas as etapas. Abaixo estão os casos em que ela errou ou assumiu algo, e as contagens
+que rodei para confirmar.
 
-1. **"precisao_passes está vazia em todas as linhas".** A IA concluiu isso olhando 5 linhas e
-   escreveu no SQL que a coluna não seria levada. A conversão de `posse_de_bola` falhou com o
-   texto `"None"`, e contando os valores por tipo apareceram 5264 linhas com percentual
-   preenchido. A coluna voltou para a refined.
-2. **Regra de "estatística zerada".** A primeira versão exigia posse nula, mas 1538 linhas
-   zeradas tinham posse = texto `"None"` e teriam passado como jogos com zero chutes. Descoberto
-   contando as combinações (nulo / `None` / zerada) antes e depois.
-3. **Cartões de 2025.** A IA assumiu que os cartões cobriam 2014–2025 e filtrou `>= 2014`.
-   O indicador mostrou Grêmio, Ceará e Santos com 0 cartões em 38 jogos. Contando os jogos com
-   cartão por temporada: 2025 tinha 0 de 380. O filtro passou a usar as temporadas que têm dado.
-4. **Teste que não testava o que dizia.** O comentário do teste de classificação dizia "A e C
-   empatam em pontos e A fica na frente por vitórias", mas no dado inventado A tinha 4 pontos e
-   C tinha 3, ou seja, não havia empate para desempatar. Descoberto recalculando a tabela à mão.
-   Foi criado um teste de desempate de verdade, e a regra foi quebrada de propósito para
-   confirmar que o teste falha.
+**1. Camada refined: coluna dada como vazia.** A IA olhou 5 linhas de `precisao_passes` e concluiu
+que a coluna estava vazia em todas, então a deixou de fora. A conversão falhou com o texto `"None"`,
+e a contagem mostrou **5264 linhas com valor**. A coluna voltou, e `"None"` passou a ser tratado como
+nulo.
+
+**2. Camada refined: regra de "estatística zerada".** A primeira regra só reconhecia a partida sem
+estatística quando a posse era nula. Contando as combinações, apareceram **1538 linhas zeradas com
+posse = `"None"`**, que teriam entrado como jogos reais com zero chutes. A regra passou a olhar só
+chutes, passes, faltas e escanteios.
+
+**3. Indicadores: cartões de 2025.** A IA assumiu que os cartões cobriam de 2014 a 2025. O indicador
+mostrou clubes com 0 cartões em 38 jogos. Contando os cartões por temporada: **2023 = 2118,
+2024 = 2096, 2025 = 0**. A fonte não tem 2025, e o filtro passou a usar só as temporadas com dado.
+
+**4. Testes: um teste que não testava o que dizia.** O teste de desempate afirmava que dois clubes
+empatavam em pontos, mas no dado inventado um tinha 4 e o outro tinha 3. Recalculei à mão, criei um
+teste com empate de verdade e quebrei a regra de propósito para ver o teste falhar.
+
+**Conferência minha:** *(escreva aqui o que você mesmo checou, por exemplo a classificação de 2013
+contra a tabela oficial)*
